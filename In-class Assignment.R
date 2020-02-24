@@ -36,9 +36,11 @@ blacklives.mayors <- mayors %>%
 
 police.mayors <- police.mayors %>% mutate(Count = replace_na(n, 0))
 police.mayors <- select(police.mayors, FullName, Count, Population)
+police.mayors <- drop_na(police.mayors, c(FullName, Population))
 
 blacklives.mayors <- blacklives.mayors %>% mutate(Count = replace_na(n, 0))
 blacklives.mayors <- select(blacklives.mayors, FullName, Count, Population)
+blacklives.mayors <- drop_na(blacklives.mayors, c(FullName, Population))
 
 
 
