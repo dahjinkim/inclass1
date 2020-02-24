@@ -35,7 +35,7 @@ blacklives.mayors <- mayors %>%
   left_join(count(blacklives.tweets, TwitterHandle), by = "TwitterHandle")
 
 #? how to retain subset of columns ?
-# change column names
+# don't forget to change column names
 
 
 ##### 3
