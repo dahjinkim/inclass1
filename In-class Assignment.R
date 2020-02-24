@@ -4,8 +4,10 @@
 #preparation
 library(tidyverse)
 library(stringr)
+library(ggplot2)
 mayors<-read_csv(file="https://raw.githubusercontent.com/jmontgomery/jmontgomery.github.io/master/PDS/Datasets/Mayors.csv")
 tweets<-read_csv("Tweets.csv")
+my.tweets <- tweets
 
 ##### 1 
 ##### Using this dataset, come up with your own approach for identifying tweets 
@@ -35,8 +37,11 @@ police.mayors <- mayors %>%
 blacklives.mayors <- mayors %>%
   left_join(count(blacklives.tweets, TwitterHandle), by = "TwitterHandle")
 
-#? how to retain subset of columns ?
-# don't forget to change column names
+police.mayors <- police.mayors %>% mutate(Count = replace_na(n, 0))
+police.mayors <- select(police.mayors, FullName, Count, Population)
+
+blacklives.mayors <- blacklives.mayors %>% mutate(Count = replace_na(n, 0))
+blacklives.mayors <- select(blacklives.mayors, FullName, Count, Population)
 
 
 ##### 3
@@ -44,4 +49,5 @@ blacklives.mayors <- mayors %>%
 ##### show how these summaary statistics relate (if it relates) 
 ##### to the population size of the city. (Plot)
 
-
+ggplot(data=police.mayors) + geom_point(mapping = aes(x = Population, y = Count))
+ggplot(data=blacklives.mayors) + geom_point(mapping = aes(x = Population, y = Count))
