@@ -19,12 +19,9 @@ tweets<-rename(tweets, TwitterHandle=ScreenName)
 police.tweets <- grep("polic|cop|law enforc|bluelives|officer", tweets$Text, ignore.case=TRUE, perl=TRUE)
 police.tweets <- tweets[police.tweets, ]
 
-
 #identifying tweets for Black lives matters
 blacklives.tweets <- grep("black live|blacklives|blm", tweets$Text, ignore.case=TRUE, perl=TRUE)
 blacklives.tweets <- tweets[blacklives.tweets, ]
-
-#? how to identify multiple patterns ?
 
 
 
@@ -44,10 +41,14 @@ blacklives.mayors <- blacklives.mayors %>% mutate(Count = replace_na(n, 0))
 blacklives.mayors <- select(blacklives.mayors, FullName, Count, Population)
 
 
+
 ##### 3
 ##### Using the mayors data from last time, 
 ##### show how these summaary statistics relate (if it relates) 
 ##### to the population size of the city. (Plot)
 
-ggplot(data=police.mayors) + geom_point(mapping = aes(x = Population, y = Count))
-ggplot(data=blacklives.mayors) + geom_point(mapping = aes(x = Population, y = Count))
+policetweetplots <- ggplot(data=police.mayors) + geom_point(mapping = aes(x = Population, y = Count))
+BLMtweetplots <- ggplot(data=blacklives.mayors) + geom_point(mapping = aes(x = Population, y = Count))
+
+policetweetplots
+BLMtweetplots
