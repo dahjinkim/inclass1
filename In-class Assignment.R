@@ -1,5 +1,5 @@
 ##### In-class Assignment
-##### Team: Alex Newman, Diva Harsoor, Oyin
+##### Team: Alex Newman, Diva Harsoor, Oyin, Jin
 
 #preparation
 library(tidyverse)
@@ -14,11 +14,12 @@ tweets<-read_csv("Tweets.csv")
 tweets<-rename(tweets, TwitterHandle=ScreenName)
 
 #identifying tweets for Police, cops
-police.tweets <- grep("polic", tweets$Text, ignore.case=TRUE, perl=TRUE)
+police.tweets <- grep("polic|cop|law enforc|bluelives|officer", tweets$Text, ignore.case=TRUE, perl=TRUE)
 police.tweets <- tweets[police.tweets, ]
 
+
 #identifying tweets for Black lives matters
-blacklives.tweets <- grep("black live", tweets$Text, ignore.case=TRUE, perl=TRUE)
+blacklives.tweets <- grep("black live|blacklives|blm", tweets$Text, ignore.case=TRUE, perl=TRUE)
 blacklives.tweets <- tweets[blacklives.tweets, ]
 
 #? how to identify multiple patterns ?
