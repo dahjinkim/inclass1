@@ -1,5 +1,6 @@
 ##### In-class Assignment
 ##### Team: Alex Newman, Diva Harsoor, Oyin, Jin
+rm(list=ls())
 
 #preparation
 library(tidyverse)
@@ -16,11 +17,14 @@ my.tweets <- tweets
 tweets<-rename(tweets, TwitterHandle=ScreenName)
 
 #identifying tweets for Police, cops
-police.tweets <- grep("polic|cop|law enforc|bluelives|officer", tweets$Text, ignore.case=TRUE, perl=TRUE)
+police.tweets <- grep("polic| cop | cops|law enforc|bluelives|officer", tweets$Text, ignore.case=TRUE, perl=TRUE)
 police.tweets <- tweets[police.tweets, ]
+#removing policy/policies
+other <- grep("policy|policies", police.tweets$Text, ignore.case = TRUE, perl = TRUE)
+police.tweets <- police.tweets[-other, ]
 
 #identifying tweets for Black lives matters
-blacklives.tweets <- grep("black live|blacklives|blm", tweets$Text, ignore.case=TRUE, perl=TRUE)
+blacklives.tweets <- grep("black live|blacklives|blm|#ferguson| ferguson", tweets$Text, ignore.case=TRUE, perl=TRUE)
 blacklives.tweets <- tweets[blacklives.tweets, ]
 
 
@@ -34,14 +38,21 @@ police.mayors <- mayors %>%
 blacklives.mayors <- mayors %>%
   left_join(count(blacklives.tweets, TwitterHandle), by = "TwitterHandle")
 
-police.mayors <- police.mayors %>% mutate(Count = replace_na(n, 0))
-police.mayors <- select(police.mayors, FullName, Count, Population)
+#number of police tweets per mayors
+police.mayors <- police.mayors %>% mutate(Polcount = replace_na(n, 0))
+police.mayors <- select(police.mayors, FullName, Polcount, Population)
 police.mayors <- drop_na(police.mayors, c(FullName, Population))
 
-blacklives.mayors <- blacklives.mayors %>% mutate(Count = replace_na(n, 0))
-blacklives.mayors <- select(blacklives.mayors, FullName, Count, Population)
+#number of BLM tweets per mayors
+blacklives.mayors <- blacklives.mayors %>% mutate(BLMcount = replace_na(n, 0))
+blacklives.mayors <- select(blacklives.mayors, FullName, BLMcount, Population)
 blacklives.mayors <- drop_na(blacklives.mayors, c(FullName, Population))
 
+#combining the data set
+mayor.tweet.data <- blacklives.mayors %>%
+  left_join(police.mayors, by = "FullName") %>%
+  mutate(Population = Population.x) %>%
+  select(FullName, BLMcount, Polcount, Population)
 
 
 ##### 3
@@ -49,8 +60,12 @@ blacklives.mayors <- drop_na(blacklives.mayors, c(FullName, Population))
 ##### show how these summaary statistics relate (if it relates) 
 ##### to the population size of the city. (Plot)
 
-policetweetplots <- ggplot(data=police.mayors) + geom_point(mapping = aes(x = Population, y = Count))
-BLMtweetplots <- ggplot(data=blacklives.mayors) + geom_point(mapping = aes(x = Population, y = Count))
+mayortweetplot <- ggplot(data=mayor.tweet.data) + 
+  geom_point(mapping = aes(x = Population, y = Polcount, color = "Police")) +
+  geom_point(mapping = aes(x = Population, y = BLMcount, color = "BLM")) +
+  labs(x = "Population", y = "Tweet Counts") +
+  scale_color_manual(name = "Tweet", values = c("Police" = "blue", "BLM" = "red"), 
+                     labels = c("BLM", "Police"))
+  
+mayortweetplot
 
-policetweetplots
-BLMtweetplots
