@@ -65,7 +65,8 @@ mayortweetplot <- ggplot(data=mayor.tweet.data) +
   geom_point(mapping = aes(x = Population, y = BLMcount, color = "BLM")) +
   labs(x = "Population", y = "Tweet Counts", title="City Population and Tweets") +
   scale_color_manual(name = "Tweet", values = c("Police" = "blue", "BLM" = "red"), 
-                     labels = c("BLM", "Police"))
+                     labels = c("BLM", "Police"))+
+  scale_x_log10()
 
 
 mayortweetplot
