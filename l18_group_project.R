@@ -19,47 +19,55 @@ senateTest = senateData_ReM[senateData_ReM$cycle == 2016,]
 ProjectModelTrain<-glm(IncumbentWon~pvi*Republican+PercentageRaised+GenericBallotSept, data=senateTrain, family="binomial")
 summary(ProjectModelTrain)
 result = predict(ProjectModelTrain, senateTest, type="response")
-
+result
 # confusion matrix
+# lin_result = (exp(result))/(1+exp(result)) # sigmoidal
+# lin_result # sigmoidal
 binary_result = (result > 0.5)*1
+
 conf_mat = table(binary_result, senateTest$IncumbentWon)
 conf_mat
+# binary_result FALSE TRUE
+# 0     3    2
+# 1     3   21
 precision = conf_mat[2,2]/(conf_mat[2,2]+conf_mat[2,1])
 recall = conf_mat[2,2]/(conf_mat[2,2]+conf_mat[1,2])
-precision
-recall
-
+precision # 0.875
+recall # 0.9130435
 
 
 # k nearest neighbors
+library(class)
+incumWonTrain<-senateTrain[,c("pvi", "Republican", "PercentageRaised", "GenericBallotSept")]
+incumWonTest<-senateTest[,c("pvi", "Republican", "PercentageRaised", "GenericBallotSept")]
+mod1_knn<-knn(train=incumWonTrain, test=incumWonTest, cl=senateTrain$IncumbentWon, k=5)
+conf_mat = table(mod1_knn, senateTest$IncumbentWon)
+conf_mat
+# mod1_knn FALSE TRUE
+# FALSE     1    2
+# TRUE      5   21
+precision = conf_mat[2,2]/(conf_mat[2,2]+conf_mat[2,1])
+recall = conf_mat[2,2]/(conf_mat[2,2]+conf_mat[1,2])
+precision # 0.8076923
+recall # 0.9130435
 
-result = predict(ProjectModelTrain, senateTest, type="response")
+
+# random forest
+library(randomForest)
+equation<-as.formula("IncumbentWon~pvi*Republican+PercentageRaised+GenericBallotSept")
+senateTrain$IncumbentWon<-as.factor(senateTrain$IncumbentWon)
+mod1_forest<-randomForest(equation, data=senateTrain, 
+                          ntree=100, mtry=4)
+result = predict(ProjectModelTrain, senateTest)
 
 # confusion matrix
 binary_result = (result > 0.5)*1
 conf_mat = table(binary_result, senateTest$IncumbentWon)
 conf_mat
+# binary_result FALSE TRUE
+# 0     4    3
+# 1     2   20
 precision = conf_mat[2,2]/(conf_mat[2,2]+conf_mat[2,1])
 recall = conf_mat[2,2]/(conf_mat[2,2]+conf_mat[1,2])
-precision
-recall
-
-
-# random forest
-library(rpart)
-equation<-as.formula("IncumbentWon~pvi*Republican+PercentageRaised+GenericBallotSept")
-# tree_mod1<-rpart(equation, data=senateTrain)
-# result = predict(tree_mod1, senateTest)
-
-library(randomForest)
-senateTrain$IncumbentWon<-as.factor(senateTrain$IncumbentWon) # Leave as continuous for regression
-mod1_forest<-randomForest(equation, data=senateTest, 
-                          ntree=201, mtry=2)
-mod1_forest # This confusion matrix is "out of bag"
-
-# confusion matrix
-conf_mat = mod1_forest$confusion
-precision = conf_mat[2,2]/(conf_mat[2,2]+conf_mat[2,1])
-recall = conf_mat[2,2]/(conf_mat[2,2]+conf_mat[1,2])
-precision
-recall
+precision #0.9090909
+recall #0.8695652
