@@ -3,9 +3,10 @@
 library(readr)
 library(dplyr)
 library(stringr)
+library(ggplot2)
 
-contrib_dir = "C:/Users/oyina/src/senior_2019-2020/spring_2020/political_data_science/group_work/final_project/itpas2.txt"
-covid_dir = 'C:/Users/oyina/src/senior_2019-2020/spring_2020/political_data_science/group_work/final_project/daily.csv'
+contrib_dir = "itpas2.txt"
+covid_dir = 'daily.csv'
 covid_og = read.csv(covid_dir)
 contrib_og = read.delim(contrib_dir, sep = '|', header = FALSE)
 contrib_og = data.frame(contrib_og)
@@ -68,12 +69,40 @@ for (row in 1:nrow(contrib)) {
     }
   }
 }
+
+stateabbsdc<-c(state.abb,"DC")
+
 print(contrib_week)
 contrib = contrib %>%
   mutate(week = contrib_week)
 
+weeklycontribs<-contrib%>%
+  group_by(state,week)%>%
+  summarise(sum(amount))%>%
+  rename(amountsum= `sum(amount)`)
+  
+weeklycontribs<-weeklycontribs%>%
+  filter(state%in%stateabbsdc)
 
+#weeklycovid<-covid%>%
+  #filter(state%in% stateabbsdc)
 
+weeklycovid<-covid%>%
+  group_by(state,week)%>%
+  summarise(sum(deathIncrease))%>%
+  rename(deathsum= `sum(deathIncrease)`)
+
+fullweekly<-full_join(weeklycovid,weeklycontribs, by= c("state","week"))
+
+fullweekly<-fullweekly%>%
+  mutate(week=as.Date(week))
+
+ggplot(data=filter(fullweekly, state=="NY") )+
+  geom_line(mapping= aes(x=week, y=log(deathsum)))+
+  geom_line(mapping=aes(x=week, y=log(amountsum), color="red"))+
+  scale_x_date(limits=c(as.Date("2020-3-10"),as.Date("2020-4-28" )))#+
+  #facet_wrap(~state)
+  
 # write web scrapper or use api for 
 
 # contributions from individuals
