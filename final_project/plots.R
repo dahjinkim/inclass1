@@ -10,7 +10,7 @@ library(ggplot2)
 
 
 #read data
-fullweekly <- read.csv("fullweekly.csv")
+fullweekly <- read.csv("C:/Users/oyina/src/senior_2019-2020/spring_2020/political_data_science/group_work/final_project/fullweekly.csv")
 fullweekly$week <- as.Date(fullweekly$week)
 
 
@@ -45,8 +45,8 @@ state1 <- ggplot(data=filter(fullweekly, state=="NY"))+
   geom_line(mapping= aes(x=week, y=log(deathsum)))+
   geom_line(mapping=aes(x=week, y=log(committee), color="Committee"))+
   geom_line(mapping=aes(x=week, y=log(individual), color="Individual"))+
-  scale_x_date(limits=c(as.Date("2020-1-01"),as.Date("2020-4-28" )))
-state1 +  labs(title="Contribution and COVID19 Deaths (New York)", y="Logged Value") +
+  scale_x_date(limits=c(as.Date("2020-1-01"),as.Date("2020-4-28" )))+
+  labs(title="Contribution and COVID19 Deaths (New York)", y="Logged Value") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   scale_color_manual(name = "Contribution", values = c("Committee" = "darkgreen", "Individual" = "darkorange"), labels = c("Committee", "Individual"))
 
