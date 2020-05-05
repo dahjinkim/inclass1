@@ -29,15 +29,17 @@ shinyServer(function(input, output) {
     })
     # Now we prepare the output
     output$trendPlot <-renderPlot({ # Note the brace
-        thePlot<-ggplot(passData()) +  # Note passData() is a function
-            geom_line(mapping= aes(x=week, y=log(deathsum)))+
+        # print("this")
+        thePlot<-(ggplot(passData()) +  # Note passData() is a function
+            geom_line(mapping= aes(x=week, y=log(deathsum))) +
             geom_line(mapping=aes(x=week, y=log(committee), color="Committee"))+
             geom_line(mapping=aes(x=week, y=log(individual), color="Individual"))+
-            scale_x_date(limits=c(as.Date("2020-1-01"),as.Date("2020-4-28" ))) + 
+            scale_x_date(limits=c(as.Date("2020-1-01"),as.Date("2020-4-28" ))) +
             labs(title="Contribution and COVID19 Deaths (New York)", y="Logged Value") +
             theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-            scale_color_manual(name = "Contribution", values = c("Committee" = "darkgreen", "Individual" = "darkorange"), labels = c("Committee", "Individual"))
-        print(thePlot)
+            scale_color_manual(name = "Contribution", values = c("Committee" = "darkgreen", "Individual" = "darkorange"), labels = c("Committee", "Individual")))
+            print(thePlot)
+            return(thePlot)
     })
 }) # Close function/shinyServer call
 
