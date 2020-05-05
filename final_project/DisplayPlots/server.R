@@ -21,14 +21,21 @@ shinyServer(function(input, output) {
     weeklyData<-read.csv("../fullweekly.csv") 
     #weeklyData<-read.csv("C:/Users/User/Documents/GitHub/inclass1/final_project/fullweekly.csv")
   # This will be updated when options are changed.
-    passData<-reactive({ 
-        WeeklyForState<-weeklyData %>%
-            filter(state == input$stateSelect) %>%
+    passData<-reactive({
+      if (input$stateSelect == "Full Trend") { 
+      Weekly<-weeklyData %>%
             mutate(week = as.Date(week))
             # select(c("Poll", "daysLeft", "Candidateidentifier")) %>% 
             # group_by(Candidateidentifier)
-        print(input$stateSelect)
-        return(WeeklyForState)
+        return(Weekly)
+      } else {
+        Weekly<-weeklyData %>%
+          filter(state == input$stateSelect) %>%
+          mutate(week = as.Date(week))
+        # select(c("Poll", "daysLeft", "Candidateidentifier")) %>% 
+        # group_by(Candidateidentifier)
+        return(Weekly)
+      }
     })
     # Now we prepare the output
     output$trendPlot <-renderPlot({ # Note the brace
@@ -38,7 +45,7 @@ shinyServer(function(input, output) {
             geom_line(mapping=aes(x=week, y=log(committee), color="Committee"))+
             geom_line(mapping=aes(x=week, y=log(individual), color="Individual"))+
             scale_x_date(limits=c(as.Date("2020-1-01"),as.Date("2020-4-28" ))) +
-            labs(title=paste("Contribution and COVID19 Deaths in", input$stateSelect), y="Logged Value", x="Month") +
+            labs(title=paste("Contribution and COVID19 Deaths"), y="Logged Value", x="Month") +
             theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
             scale_color_manual(name = "Contribution", values = c("Committee" = "darkgreen", "Individual" = "darkorange"), labels = c("Committee", "Individual"))
             print(thePlot)
