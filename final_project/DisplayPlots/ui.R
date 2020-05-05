@@ -15,11 +15,7 @@ shinyUI(fluidPage(
         sidebarPanel(
             selectInput(inputId = "stateSelect", # Different input
                         label = "Choose state to display",
-                        choices=c("MO"="Missouri",
-                                  "FL"="Florida",
-                                  "NC"="North Carolina",
-                                  "IA"="Iowa"
-                        ),
+                        choices= c(state.abb, "DC"),
                         multiple=FALSE
             )), ## End of sidebar
         mainPanel(  ## putting the main output here
