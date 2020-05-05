@@ -15,7 +15,7 @@ shinyUI(fluidPage(
         sidebarPanel(
             selectInput(inputId = "stateSelect", # Different input
                         label = "Choose state to display",
-                        choices= c(state.abb, "DC"),
+                        choices= c("Full Trend", state.abb, "DC"),
                         multiple=FALSE
             )), ## End of sidebar
         mainPanel(  ## putting the main output here
