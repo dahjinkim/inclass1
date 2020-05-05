@@ -39,7 +39,7 @@ indcontrib = indcontrib_og %>%
   filter(year == "2020") %>%
   mutate(month = paste0("0", month)) %>%
   mutate(month = str_sub(month, -2, -1)) %>%
-  filter(month %in% c("03", "04")) %>%
+  filter(month %in% c("01", "02", "03", "04")) %>%
   filter(as.numeric(as.character(amount)) > 0) %>%
   mutate(date_ = as.Date(paste0(year, "-", month, "-", day)))
 # mutate(date_ = as.Date(date, "%m/%d/%Y"))
@@ -48,7 +48,7 @@ covid = covid_og %>%
   mutate(year = str_sub(date, 1, 4)) %>%
   mutate(day = str_sub(date, 7, 8)) %>%
   mutate(month = str_sub(date, 5, 6)) %>%
-  mutate(date_ = as.Date(paste0(year, "-", month, "-", day))) #maybe?
+  mutate(date_ = as.Date(paste0(year, "-", month, "-", day)))
 
 
 # create date range vector
@@ -89,9 +89,24 @@ for (row in 1:nrow(contrib)) {
   }
 }
 
+
+# add row to indcontrib data for week
+indcontrib_week = rep(NA, nrow(indcontrib))
+for (row in 1:nrow(indcontrib)) {
+  for (date in 1:length(date_ranges)) {
+    if (indcontrib$date_[row] <= date_ranges[date]) {
+      # print(covid$date[row])
+      # print(date_ranges[date])
+      indcontrib_week[row] = as.character(as.Date(date_ranges[date]))
+      break
+    }
+  }
+}
+
+# combine them
+# filter states
 stateabbsdc<-c(state.abb,"DC")
 
-print(contrib_week)
 contrib = contrib %>%
   mutate(week = contrib_week)
 
@@ -111,19 +126,6 @@ weeklycovid<-covid%>%
   summarise(sum(deathIncrease))%>%
   rename(deathsum= `sum(deathIncrease)`)
 
-# add row to indcontrib data for week
-indcontrib_week = rep(NA, nrow(indcontrib))
-for (row in 1:nrow(indcontrib)) {
-  for (date in 1:length(date_ranges)) {
-    if (indcontrib$date_[row] <= date_ranges[date]) {
-      # print(covid$date[row])
-      # print(date_ranges[date])
-      indcontrib_week[row] = as.character(as.Date(date_ranges[date]))
-      break
-    }
-  }
-}
-
 
 indcontrib <- indcontrib %>%
   mutate(week = indcontrib_week)
@@ -134,6 +136,7 @@ weeklyindcont<-indcontrib %>%
   summarise(sum(as.numeric(as.character(amount)))) %>%
   rename(amountsum= `sum(as.numeric(as.character(amount)))`)
 
+# full data
 
 fullweekly<-full_join(weeklycovid,weeklycontribs, by= c("state","week"))
 fullweekly <- full_join(fullweekly, weeklyindcont, by=c("state", "week"))
@@ -143,7 +146,12 @@ fullweekly<-fullweekly%>%
   rename(committee = amountsum.x) %>%
   rename(individual = amountsum.y)
 
+# export data
+
 write.table(fullweekly, file="fullweekly.csv", sep = ",")
+
+
+# example plot
 
 ggplot(data=fullweekly)+
   geom_line(mapping= aes(x=week, y=log(deathsum)))+
